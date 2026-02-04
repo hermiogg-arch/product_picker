@@ -1,10 +1,21 @@
 import { defineConfig } from 'vitepress'
+import { katex } from '@mdit/plugin-katex'
+import { createMermaidPlugin } from './mermaid-plugin'
 
 export default defineConfig({
     title: "Product Picker",
     description: "A Bayesian tool for discovering your true preferences",
     base: '/product_picker/',
     cleanUrls: true,
+    markdown: {
+        config(md) {
+            md.use(katex)
+            md.use(createMermaidPlugin())
+        }
+    },
+    head: [
+        ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css' }]
+    ],
     themeConfig: {
         nav: [
             { text: 'Home', link: '/' },
