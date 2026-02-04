@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useData } from 'vitepress'
 import mermaid from 'mermaid'
 
@@ -22,7 +22,7 @@ const renderDiagram = async () => {
       securityLevel: 'loose'
     })
 
-    const { svg } = await mermaid.render('mermaid-diagram', decodedCode)
+    const { svg } = await mermaid.render(`mermaid-${Math.random()}`, decodedCode)
     svgRef.value.innerHTML = svg
   } catch (error) {
     console.error('Mermaid render error:', error)
@@ -31,6 +31,10 @@ const renderDiagram = async () => {
 }
 
 onMounted(() => {
+  renderDiagram()
+})
+
+watch(() => isDark.value, () => {
   renderDiagram()
 })
 </script>
