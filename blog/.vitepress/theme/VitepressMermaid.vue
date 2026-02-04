@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, nextTick } from 'vue'
 import { useData } from 'vitepress'
-import mermaid from 'mermaid'
 
 interface Props {
   code: string
@@ -16,26 +15,34 @@ const renderDiagram = async () => {
   if (!svgRef.value) return
 
   try {
+    // Dynamic import to avoid SSR issues
+    const mermaid = (await import('mermaid')).default
+    
     mermaid.initialize({
-      startOnLoad: true,
+      startOnLoad: false,
       theme: isDark.value ? 'dark' : 'default',
       securityLevel: 'loose'
     })
 
-    const { svg } = await mermaid.render(`mermaid-${Math.random()}`, decodedCode)
+    const id = `mermaid-${Math.random().toString(36).substring(7)}`
+    const { svg } = await mermaid.render(id, decodedCode)
     svgRef.value.innerHTML = svg
   } catch (error) {
     console.error('Mermaid render error:', error)
-    svgRef.value.innerHTML = `<pre>${decodedCode}</pre>`
+    svgRef.value.innerHTML = `<pre style="text-align: left; overflow-x: auto;">${decodedCode}</pre>`
   }
 }
 
 onMounted(() => {
-  renderDiagram()
+  nextTick(() => {
+    renderDiagram()
+  })
 })
 
 watch(() => isDark.value, () => {
-  renderDiagram()
+  nextTick(() => {
+    renderDiagram()
+  })
 })
 </script>
 
